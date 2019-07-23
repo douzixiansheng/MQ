@@ -66,3 +66,38 @@
     4377 Kafka
     4139 QuorumPeerMain
     ```
+
+> Kafka 使用
+- 创建主题
+```topic
+./kafka-topics.sh --create --topic mytopic2 --zookeeper localhost:2181 --partitions 3 --replication-factor 1
+```
+    执行结果
+    Created topic "mytopic2".
+
+- 查看当前主题
+```topic
+ ./kafka-topics.sh --describe --zookeeper localhost:2181
+ 或只看主题名称
+ ./kafka-topics.sh --list --zookeeper localhost:2181
+```
+    执行结果
+    Topic:mytopic2  PartitionCount:3        ReplicationFactor:1     Configs:
+        Topic: mytopic2 Partition: 0    Leader: 0       Replicas: 0     Isr: 0
+        Topic: mytopic2 Partition: 1    Leader: 0       Replicas: 0     Isr: 0
+        Topic: mytopic2 Partition: 2    Leader: 0       Replicas: 0     Isr: 0
+    Topic:mytopic3  PartitionCount:3        ReplicationFactor:1     Configs:
+        Topic: mytopic3 Partition: 0    Leader: 0       Replicas: 0     Isr: 0
+        Topic: mytopic3 Partition: 1    Leader: 0       Replicas: 0     Isr: 0
+        Topic: mytopic3 Partition: 2    Leader: 0       Replicas: 0     Isr: 0
+
+
+- 查看某个主题是否存在
+    ```topic
+    ./kafka-topics.sh --list --zookeeper localhost:2181|grep mytopic11
+    ```
+
+- 修改主题
+    ```topic
+    ./kafka-topics.sh --zookeeper localhost:2181 --alter --topic mytopic2 --partitions 10
+    ```
