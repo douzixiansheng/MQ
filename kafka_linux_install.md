@@ -101,3 +101,23 @@
     ```topic
     ./kafka-topics.sh --zookeeper localhost:2181 --alter --topic mytopic2 --partitions 10
     ```
+- 删除配置参数
+  ```topic
+  ./kafka-topics.sh --zookeeper localhost:2181 --alter --topic mytopic2 --delete-config flush.messages
+  ```
+- 删除主题
+  ```topic
+  ./kafka-topics.sh --zookeeper localhost:2181 --delete --topic mytopic2
+  结果：
+  Topic mytopic2 is marked for deletion.
+  Note: This will have no impact if delete.topic.enable is not set to true.
+  ```
+
+- 启动kafka producer
+  ```topic
+   ./kafka-console-producer.sh --broker-list localhost:9092 --topic mytopic3
+   ```
+- 启动kafka consumer
+    ```topic
+    ./kafka-console-consumer.sh --zookeeper localhost --topic mytopic3
+    ```
