@@ -23,5 +23,22 @@
 - - Kafka 的主题始终是支持多用户订阅的；也就是说，一个主题可以有零个，一个或多个消费者订阅写入的
 数据
 
+- - 分区数(Partitions): 控制topic将分片成多少log。可以显示指定，如果不指定则会使用broker(server.properties)中的num.partitions配置的数量
+- - replication-factor副本：控制消息保证在几个broker(服务器)上，一般情况下等于broker的个数。
+
 - 分区
+
+
+> 疑问
+- 一个broker服务下，是否可以创建多个分区？
+- - 可以，broker数与分区数没有关系
+- 一个broker服务下，是否可以创建多个副本因子?
+- - 不可以，会报错;
+    创建主题时，复本因子应该小于等于可用的broker数
+    ```linux
+    Error while executing topic command : replication factor: 3 larger than available brokers: 1
+    [2019-07-23 17:34:45,963] ERROR org.apache.kafka.common.errors.InvalidReplicationFactorException: replication factor: 3 larger than available brokers: 1
+    (kafka.admin.TopicCommand$)
+    ```
+- 在kafka中，每一个分区会有一个编号，从0开始
 # 持续更新...
