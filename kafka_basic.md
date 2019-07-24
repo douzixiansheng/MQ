@@ -26,8 +26,14 @@
 - - 分区数(Partitions): 控制topic将分片成多少log。可以显示指定，如果不指定则会使用broker(server.properties)中的num.partitions配置的数量
 - - replication-factor副本：控制消息保证在几个broker(服务器)上，一般情况下等于broker的个数。
 
-- 分区
+- 分区(Partitions)
+- - 每个Topic都有一个或者多个Partitions 构成
+- - 每个Partition都是有序且不可变的消息队列
+- - Topic的Partition数量可以在创建时配置
+- - Partition数量决定了每个Consumer group中并发消费者的最大数量
 
+- 偏移量(offset)
+- - 任何发布到partition的消息都会被直接追加到log文件的尾部，每条消息在文件中的位置称为offset(偏移量),offset是一个long型数字，它唯一标记一条消息。消费者通过(offset、partition、topic)跟踪记录.
 
 > 疑问
 - 一个broker服务下，是否可以创建多个分区？
@@ -44,4 +50,7 @@
 - 当执行删除命令之后，topic不是物理删除，而是一个标记删除的操作.
 - 标记删除之后的主题是否还可以继续生产数据？
 - - 不会有影响
+- 如何保证一个主题下的数据，一定是有序的(生产与消费的顺序一致)
+- - 让主题下只有一个分区
+- 某一个主题下的分区数，对于消费组来说，应该小于等于该主题下的分区数。
 # 持续更新...
