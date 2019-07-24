@@ -42,6 +42,41 @@
 - - 主副本叫做leader，从副本叫做follower，处于同步状态的副本叫做in-sync replicas(ISR);
 - - Follower 通过拉的方式从leader同步数据。消费者和生产者都是从leader读写数据，不与follower交互
 - - 当有多个副本数时，kafka并不是将多个副本同时对外提供读取和写入,作用是让kafka读取和写入数据时的高可靠
+- log 日志
+- - kafka-log 目录下,会根据: 主题-分区 值创建目录
+- - 00000000000000000000.index -- 索引 稀疏索引
+- - 00000000000000000000.log   -- 数据
+- - log 默认情况下会根据1G的大小，创建一个新的segment file文件
+- - 00000000000000001123.index -- 1123 offset的开始值
+- - 00000000000000001123.log
+- log 的优化
+- - 可以选择删除或者合并
+
+- kafka复制原理
+- - 消费的发送方式：主题\value、主题\key\value、主题\分区\key\value、主题\分区\时间戳
+\key\value
+- - Kafka 中topic的每个partition有一个预写式的日志文件，虽然partition可以继续细分为若干个segment文件，但是对于上层应用来说可以将partition看成最小的存储单元，每个partition都由一些列有序的、不可变的消息组成，这些消息被连续的追加到partition中。
+- - LEO：LogEndOffset的缩写，表示每个partition的log最后一条Message的位置
+- - HW： 是HighWatermark的缩写，是指consumer能够看到的此partition的位置
+
+- - 具体描述：Kafka每个topic的partition有N个副本(replicas).
+- - kafka 通过多副本机制实现故障自动转移，当kafka集群中一个broker失效情况下仍然保证服务可用。kafka中发生复制时确保partition的日志能有序地写到其他节点上，N个replicas中，其中一个replicas为leader，其他都为follower，leader处理partition的所有读写请求，于此同时，follower会被动定期地去复制leader的数据。kafka提供了数据复制算法保证，如果leader发生故障或挂掉，一个新leader被选举并接受客户端的消息成功写入。
+- - leader负责维护和跟踪ISR中所有follower滞后的状态.
+- - 当producer发送一条消息到broker后，leader写入消息并复制到所有follower。消息提交之后才被成功复制到所有的同步副本。消息复制延迟受最慢的follower限制，重要的是快速检测慢副本，如果follower"落后"太多或者失效，leader将会把它从ISR中删除.
+
+- leader 将某个follower提出ISR列表的情况：
+- - 1. 按数量——如果leader当前的offset已经到10，但是某个follower同步的数据还是2，但是kafka对于数量的偏差设置为6。如果当前偏差小于等于设置的偏差，那么会将该follower提出ISR列表，进入到OSR列表[所有的副本数据 = ISR + OSR]
+    2. 按时间——有新数据，多久没有发送确认信息
+
+![avator](images/hwpng.png)
+
+- ISR(副本同步队列)
+
+- kafka 数据可靠性
+
+- kafka 消息传输保障
+
+- kafka leader 和 follower 如何通信
 
 > 疑问
 - 一个broker服务下，是否可以创建多个分区？
