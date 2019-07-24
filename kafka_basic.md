@@ -27,6 +27,8 @@
 - - replication-factor副本：控制消息保证在几个broker(服务器)上，一般情况下等于broker的个数。
 
 - 分区(Partitions)
+
+![avator](/images/partitions_offset.png)
 - - 每个Topic都有一个或者多个Partitions 构成
 - - 每个Partition都是有序且不可变的消息队列
 - - Topic的Partition数量可以在创建时配置
@@ -35,12 +37,18 @@
 - 偏移量(offset)
 - - 任何发布到partition的消息都会被直接追加到log文件的尾部，每条消息在文件中的位置称为offset(偏移量),offset是一个long型数字，它唯一标记一条消息。消费者通过(offset、partition、topic)跟踪记录.
 
+- 副本
+- - 副本因子操作的单位是以分区为单位,每个分区都有各自的主副本和从副本
+- - 主副本叫做leader，从副本叫做follower，处于同步状态的副本叫做in-sync replicas(ISR);
+- - Follower 通过拉的方式从leader同步数据。消费者和生产者都是从leader读写数据，不与follower交互
+- - 当有多个副本数时，kafka并不是将多个副本同时对外提供读取和写入,作用是让kafka读取和写入数据时的高可靠
+
 > 疑问
 - 一个broker服务下，是否可以创建多个分区？
 - - 可以，broker数与分区数没有关系
 - 一个broker服务下，是否可以创建多个副本因子?
 - - 不可以，会报错;
-    创建主题时，复本因子应该小于等于可用的broker数
+    创建主题时，副本因子应该小于等于可用的broker数
     ```linux
     Error while executing topic command : replication factor: 3 larger than available brokers: 1
     [2019-07-23 17:34:45,963] ERROR org.apache.kafka.common.errors.InvalidReplicationFactorException: replication factor: 3 larger than available brokers: 1
