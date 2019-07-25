@@ -1,6 +1,10 @@
 # Kafka linux 安装步骤
 
+官方步骤：
+http://kafka.apache.org/quickstart
+
 > 安装步骤
+
 - 安装JDK
     Kafka 使用Zookeeper 来保存相关配置信息，Kafka及Zookeeper 依赖Java运行环境。
  <a>https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html</a>
