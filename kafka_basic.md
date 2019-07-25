@@ -71,10 +71,34 @@
 ![avator](images/hwpng.png)
 
 - ISR(副本同步队列)
+- - ISR 是所有副本的一个子集，由leader维护ISR列表，follower从leader同步数据有一些延迟，包括延迟时间 replica.lag.time.max.ms和延迟条数replica.lag.max.messages两个维度，当前最新的版本0.10.x中只支持replica.lag.time.max.ms这个维度）。任意一个超过阈值都会把follower剔除出ISR，存入OSR(Outof-Sync Replicas)列表，新加入的follower也会先存放在OSR中。
+- - leader 新写入的信息，consumer不能立刻消费，leader会等待该消息被所有ISR中的replicas同步后更新HW，此时消息才能被consumer消费。这样就保证了如果leader所在的broker失效，该消息仍然可以从新选举的leader中获取。对于来自内部的broker的读取请求，没有HW的限制。
+
+- - 同步复制要求所有的能工作的follower都复制完，这条消息才会被commit，这种复制方式是否极大的影响了吞吐率？
+
+- - 异步复制方式
+- - follower异步的从leader复制数据，数据只要被leader写入log就被认为已经commit，这种情况下如果follower都还没有复制完，落后于leader时，突然leader宕机，则会丢失数据。而kafka的这种使用ISR的方式则很好的均衡了确保数据不丢失已经吞吐率。
+
+- - Kafka的管理最终都会反馈到Zookeeper节点上。
+- - 具体位置：/brokers/topics/[topic]/partitions/[partition]/state.
+- - 目前有两个地方会对这个Zookeeper的节点进行维护：
+- - 1. Controller维护：Controller 下的LeaderSelector会选举新的leader，ISR和新的leader_epoch及controller_epoch写入Zookeeper的相关节点中。同时发起LeaderAndIsrRequest通知所有的replicas。
+    2. leader维护：leader有单独的线程定期检测ISR中follower是否脱离ISR，如果发现ISR变化，则会将新的ISR的信息返回到Zookeeper的相关节点中。
+- - Kafka集群中的其中一个Broker会被选举为Controller，主要负责Partition管理和副本状态管理，也会执行类似于重分配partition之类的管理任务。
 
 - kafka 数据可靠性
+- - 数据丢失的可能:可以采用callback的方式进行处理，判断异常信息是否为空，如果为空表示正常发送了，否则就有异常，可进行特殊处理
+
+- - 当producer向leader发送数据时，可以通过acks参数来设置数据可靠性的级别：
+- - 1. 1(默认)：这意味着producer在ISR中的leader已成功收到的数据并得到确认后发送下一条message。如果leader宕机了，则会丢失数据。
+- - 2. 0：这意味着producer无需等待来自broker的确认而继续发送下一批消息。这种情况下数据传输效率最高，但是数据可靠性是最低的
+- - 3. all：leader需要等待所有备份都写入日志，这种策略会保证只要有一个备份存活就不会丢失数据，这是最强的保证。
 
 - kafka 消息传输保障
+- - Kafka确保消息在producer和consumer之间传输。有以下三种可能的传输保障
+- - 1. At most once : 消息可能丢失，但绝不会重复传输
+- - 2. At least once : 消息绝不会丢，但可能重复传输
+- - 3. Exactly once: 每条消息肯定会被传输一次且仅传输一次
 
 - kafka leader 和 follower 如何通信
 
@@ -96,4 +120,5 @@
 - 如何保证一个主题下的数据，一定是有序的(生产与消费的顺序一致)
 - - 让主题下只有一个分区
 - 某一个主题下的分区数，对于消费组来说，应该小于等于该主题下的分区数。
+- 在使用kafka的过程中，如何保证数据的不丢失，不重复的问题？
 # 持续更新...
