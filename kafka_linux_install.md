@@ -125,3 +125,11 @@ http://kafka.apache.org/quickstart
     ```topic
     ./kafka-console-consumer.sh --zookeeper localhost --topic mytopic3
     ```
+- 终端写入kafka主题数据
+    ```topic
+    ./kafka-console-producer.sh --broker-list localhost:9092 --topic mytopic3
+    ```
+- 终端消费kafka主题数据
+    ```
+    ./kafka-console-consumer.sh --zookeeper localhost:2181 --topic mytopic3 --from-beginning
+    ```
