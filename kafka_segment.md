@@ -28,6 +28,31 @@ Segment文件命名规则：Partition全局的第一个Segment从0开始，后�
 |    关键字    | 解释 |
 | ---------- | --- |
 | offset |  消息在partition中的绝对offset。能表示这是partition的第多少条消息 |
-| message       |  message大小
+| message       |  message大小 |
+| CRC32  | 用crc32校验message |
+| magic  | 表示本次发布kafka服务程序协议版本号 |
+| attributes | 表示为独立版本、或标识压缩类型、或编码类型 |
+| key length | 表示key的长度，当key为-1时，K byte key字段不填
+| key   | 可选|
+| value bytes payload | 实际消息数据 |
 
-https://blog.csdn.net/lkforce/article/details/77854813 |
+> index 文件的存储方式
+- index 文件是二进制存储的，每条索引都记录了消息的相对offset和在文件中的物理位置。这里的相对offset和log文件里的offset不同，相对offset是每个segment都从1开始的，而绝对offset在整个partition中都是唯一的。
+**https://blog.csdn.net/lkforce/article/details/77854813** 
+
+> 分段策略
+
+| 属性名 | 含义 | 默认值 |
+| ------| ------ | ------ |
+| log.roll.{hours,ms} | 日志滚动的周期时间，到达指定周期时间时，强制生成一个新的segment|168(7 day) |
+| log.segment.bytes | 每个segment的最大容量。到达指定容量时，将强制生成一个新的segment | 1G(-1 为不限制) |
+| log.retention.check.interval.ms| 日志片段文件检查的周期时间 | 60000 |
+
+> 日志刷新策略
+Kafka的日志实际上是开始是在缓存中的，然后根据一定策略定期一批一批写入到日志文件中去，以提高吞吐量.
+
+| 属性名 | 含义 | 默认值 |
+| -----  | ---- | ---- |
+| log.flush.interval.messages | 消息达到多少条时将数据写入到日志文件 | 10000 |
+| log.flush.interval.ms | 当达到该时间时，强制执行一次flush | null |
+| log.flush.shceduler.interval.ms | 周期性检查，是否需要将信息flush | 暂时没有找到 |
