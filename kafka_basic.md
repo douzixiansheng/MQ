@@ -28,8 +28,14 @@
 
 - Consumer
 - - 消息接收者称为Consumer
+- - consumer 采用pull(拉)模式从broker中读取数据
+- - push(推) 模式很难适应消费速率不同的消费者，因为消息发送速率是由broker决定的。它的目标是尽可能以最快速度传递消息，但是这样很容易造成consumer来不及处理消息，典型的表现就是拒绝服务以及网络拥塞。而pull模式则可以根据consumer的消费能力以适当的速率消费消息
+- - 对于Kafka而言,pull模式更合适，它可简化broker的设计，consumer可自主控制消费消息的速率，同时consumer可以自己控制消费方式——即可批量消费也可逐条消费， 同时还能选择不同的提交方式从而实现不同的传输语义
+- - pull 模式不足之处是，如果kafka没有数据，消费者可能会陷入循环中，一直等待数据到达。为了避免这种情况，我们在拉请求中有参数，允许消费者请求在的等待数据到达的"长轮询"中进行阻塞(并且可选地等待到给定的字节数，以确保打的传输大小)
 - Consumer Group (CG)
 - - 这是kafka用来实现一个topic消息的广播(发给所有的consumer)和单播(发给任意一个consumer)的手段。一个topic可以有多个CG。topic的消息会复制(概念上的复制)到所有的CG，但每个partition只会把消息发给该CG中的一个consumer。如果需要实现广播，只要每个consumer有一个独立的CG就可以了。要实现单播只要所有consumer在同一个CG。用CG还可以将consumer进行自由的分组而不需要多次发送消息到不同的topic
+- - 每个分区在同一时间只能由group中的一个消费者读取，但是多个group可以同时消费这个partition。
+
 - Broker(代理)
 - - 已发布的消息保存在一组服务器中，称之为Kafka集群。集群中的每一个服务器都是一个代理。
 - 主题(Topic)
@@ -74,6 +80,25 @@
 - - 00000000000000001123.log
 - log 的优化
 - - 可以选择删除或者合并
+
+- Kafka 消费过程分析
+- - Kafka提供了两套consumer API：高级Consumer API 和 低级 Consumer API
+- -  高级API 优点
+- - 1. 高级API写起来简单
+- - 2. 不需要自行去管理offset，系统通过zookeeper自行管理
+- - 3. 不需要管理分区，副本等情况，系统自动管理
+- - 4. 消费者断线会自动根据上一次记录在zookeeper中的offset去接着获取数据(默认设置1分钟更新一下zookeeper中存的offset)
+- - 5. 可以使用group来区分对同一个topic的不同程序访问分离开来(不同的group记录不同的offset，这样不同程序读取同一个topic才不会因为offset互相影响)
+- - 高级API 缺点
+- - 1. 不能自行控制offset(对于某些特殊需求)
+- - 2. 不能细化控制，如分区、副本、zk等
+- - 低级API
+- - 低级API优点
+- - 1. 能够让开发者自己控制offset，想从哪里读取就从哪里读取
+- - 2. 自行控制连接分区，对分区自定义进行负载均衡
+- - 3. 对zookeeper的依赖性降低(如：offset不一定非要靠zk存储，自行存储offset即可，比如存储在文件或则内存中)
+- - 低级API缺点
+- - 太过复杂，需要自行控制offset，连接哪个分区，找到分区leader等
 
 - kafka复制原理
 - - 消费的发送方式：主题\value、主题\key\value、主题\分区\key\value、主题\分区\时间戳
