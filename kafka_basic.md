@@ -16,7 +16,16 @@
 - Connector API: 允许构建和运行可重用的生产者或消费者，能够把kafka主题连接到现有的应用程序或数据系统
 
 > Kafka 基础概念
->>
+
+- 无论是kafka集群，还是consumer都依赖于zookeeper集群保存一些meta信息，来保证系统可用性
+- Producer
+- - 发送消息者称为 Producer
+- Consumer
+- - 消息接受者称为Consumer
+- Consumer Group (CG)
+- - 这是kafka用来实现一个topic消息的广播(发给所有的consumer)和单播(发给任意一个consumer)的手段。一个topic可以有多个CG。topic的消息会复制(概念上的复制)到所有的CG，但每个partition只会把消息发给该CG中的一个consumer。如果需要实现广播，只要每个consumer有一个独立的CG就可以了。要实现单播只要所有consumer在同一个CG。用CG还可以将consumer进行自由的分组而不需要多次发送消息到不同的topic
+- Broker(代理)
+- - 已发布的消息保存在一组服务器中，称之为Kafka集群。集群中的每一个服务器都是一个代理。
 - 主题(Topic)
 - - Kafka将消息以topic为单位进行归纳(一条消息必须属于某一个主题)
 - - 在Kafka集群中，可以有无数的主题
