@@ -2,6 +2,8 @@
 ## Kafka是一个分布式消息队列，具有高性能、持久化、多副本备份、横向扩展能力.(pub-sub模型)
 > 维基百科
 >> Kafka 是由Apache软件基金会开发的一个开源流处理平台，由Scala和JAVA编写.该项目的目标是为处理实时数据提供一个统一、高吞吐、低延迟的平台。其持久化层本质是一个"按照分布式事务日志架构的大规模发布/订阅消息队列".Kafka可以通过Kafka Connect连接到外部系统(用于数据输入/输出),并提供了Kafka Streams ———— 一个Java流式处理库.
+
+
 ## 基于kafka-zookeeper 的分布式消息队列系统总体架构如下：
 ![avator](/images/kafka-zookeeper.png)
 
@@ -18,10 +20,14 @@
 > Kafka 基础概念
 
 - 无论是kafka集群，还是consumer都依赖于zookeeper集群保存一些meta信息，来保证系统可用性
+- Producer 采用推(push)模式将消息发布到broker，每条消息都被追加(append)到分区(partition)中，属于顺序写磁盘(顺序写磁盘效率比随机写内存要高，保障kafka吞吐率)
 - Producer
 - - 发送消息者称为 Producer
+
+![avator](images/producer_pull.png)
+
 - Consumer
-- - 消息接受者称为Consumer
+- - 消息接收者称为Consumer
 - Consumer Group (CG)
 - - 这是kafka用来实现一个topic消息的广播(发给所有的consumer)和单播(发给任意一个consumer)的手段。一个topic可以有多个CG。topic的消息会复制(概念上的复制)到所有的CG，但每个partition只会把消息发给该CG中的一个consumer。如果需要实现广播，只要每个consumer有一个独立的CG就可以了。要实现单播只要所有consumer在同一个CG。用CG还可以将consumer进行自由的分组而不需要多次发送消息到不同的topic
 - Broker(代理)
@@ -36,12 +42,20 @@
 - - replication-factor副本：控制消息保证在几个broker(服务器)上，一般情况下等于broker的个数。
 
 - 分区(Partitions)
+- - 消息发送时都被发送到一个topic，其本质就是一个目录，而topic是有一些Partition Logs(分区日志)组成
 
 ![avator](/images/partitions_offset.png)
 - - 每个Topic都有一个或者多个Partitions 构成
 - - 每个Partition都是有序且不可变的消息队列
 - - Topic的Partition数量可以在创建时配置
 - - Partition数量决定了每个Consumer group中并发消费者的最大数量
+- - 分区的原因：
+- - 1. 方便在集群中扩展，每个Partition可以通过调整以适应它所在的机器，而一个topic又可以有多个Partition组成，因此整个集群就可以适应任意大小的数据了；
+- - 2. 可以提高并发，因为可以以Partition为单位读写
+- - 分区的原则：
+- - 1. 指定了partition，则直接使用
+- - 2. 未指定partition但指定key，通过对key的value进行hash出一个partition
+- - 3. partition和key都未指定，使用轮询选出一个partition
 
 - 偏移量(offset)
 - - 任何发布到partition的消息都会被直接追加到log文件的尾部，每条消息在文件中的位置称为offset(偏移量),offset是一个long型数字，它唯一标记一条消息。消费者通过(offset、partition、topic)跟踪记录.
@@ -130,4 +144,6 @@
 - - 让主题下只有一个分区
 - 某一个主题下的分区数，对于消费组来说，应该小于等于该主题下的分区数。
 - 在使用kafka的过程中，如何保证数据的不丢失，不重复的问题？
+- 如何确保Producer不丢失数据?
+- ACK (应答机制设置为2)
 # 持续更新...
