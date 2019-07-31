@@ -171,4 +171,21 @@
 - 在使用kafka的过程中，如何保证数据的不丢失，不重复的问题？
 - 如何确保Producer不丢失数据?
 - ACK (应答机制设置为2)
+- Kafka 的用途？使用场景？
+- - 消息系统；实时监控或者离线处理；日志收集
+- - 异常处理、日常系统削峰、解耦、提速、广播
+- Kafka中的ISR、AR代表什么？ISR的伸缩?
+- - ISR: In-Sync Replicas 副本同步队列
+- - AR: Assigned Replicas 所有副本
+- - ISR是由leader维护，follower从leader同步数据有一些延迟(包括延迟时间replica.lag.time.max.ms 和 延迟条数 replica.lag.max.message两个维度，当前最新的版本0.10.x 中只支持replica.lag.time.max.ms这个维度),任意一个超过阈值都会把follower剔除出ISR,存入OSR(Outof-Sync Replicas)列表，新加入的follower也会存放在OSR中。AR=ISR+OSR
+- Kafka中的HW、LEO、LSO、LW等分别代表什么？
+- - HW: High Watermark 高水位，取一个partition对应的ISR中最小的LEO作为HW，consumer最多只能消费到HW所在的位置上一条信息
+- - LEO: LogEndOffset 当然日志文件中下一条代写信息的offset
+- - HW/LEO 这两个都是指最后一条的下一条的位置而不是最后一条的位置
+- - LSO: Last Stable Offset 对未完成的事务而言，LSO的值等于事务中第一条消息的位置(firstUnstableOffset),对已完成的事务而言，它的值同HW相同
+- - LW: Low Watermark 低水位，代表AR集合中最小的logStartOffset值
+- Kafka 中是怎么体现消息顺序性的?
+- - Kafka每个partition中的消息在写入是都是有序的，消费时，每个partition只能被每一个group中的消费者消费，保证了消费时也是有序的
+- - 整个topic不保证有序。如果为了保证topic整个有序，那么将partition调整为1
+
 # 持续更新...
