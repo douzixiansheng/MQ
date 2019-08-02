@@ -1,4 +1,6 @@
 # Kafka 中的底层存储设计
+- Kafka 附带了一个叫DumpLogSegment 的工具，可以用它查看片段的内容。它可以显示每个消息的偏移量、校验和、魔术数字节、消息大小和压缩算法。
+
 > Segment 是kafka文件存储的最小单位
 - 日志存放目录  kafka_2.10-0.10.2.1/config/server.properties <br>
 ![avator](images/kafka_log.png)
