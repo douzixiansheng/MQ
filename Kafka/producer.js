@@ -8,12 +8,13 @@ let conn = {'kafkaHost':'127.0.0.1:9092'};
 
 var MQ = function (){
     this.mq_producers = {};
+    this.client = {};
 }
 
 MQ.prototype.AddProducer = function (conn, handler){
     console.log('增加生产者',conn, this);
-    let client = new kafka.KafkaClient(conn);
-    let producer = new kafka.Producer(client);
+    this.client = new kafka.KafkaClient(conn);
+    let producer = new kafka.Producer(this.client);
 
     producer.on('ready', function(){
         if(!!handler){
@@ -34,9 +35,22 @@ var mq = new MQ();
 mq.AddProducer(conn, function (producer){
     producer.createTopics(['broadcast'], function (){
         setInterval(function(){
-            mq.mq_producers['common'].send([{topic:['broadcast'], 
-            messages:[JSON.stringify({"cmd":"testRpc","value":"Hello World"})]}], function (){
-                console.log("..... ");
+
+            var _msg = {
+                topic:['broadcast'], 
+                messages:[JSON.stringify({"cmd":"testRpc","value":"Hello World"})],
+                partition:0
+            }
+
+
+            //console.log('clientId : ',mq.client.clientId);
+            //console.log('topicMetadata ',mq.client.topicMetadata);
+            //console.log('brokerMetadata ',mq.client.brokerMetadata);
+            //console.log('clusterMetadata ',mq.client.clusterMetadata);
+            //console.log('brokerMetadataLastUpdate ',mq.client.brokerMetadataLastUpdate);
+
+            mq.mq_producers['common'].send([_msg], function (err, data){
+                console.log("..... ",data);
             })
         }, 2000);
     })
