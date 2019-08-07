@@ -10,11 +10,9 @@ let conn = {'kafkaHost':'127.0.0.1:9092'};
 let consumers = [
     {
         'type': 'consumer',
-        'options': {'autoCommit': true},
-        'name':'common',
-        'topic':[
-            {'topic': 'broadcast', 'partition': 0}
-        ]
+        'options': {'autoCommit': true,"groupId":"consumer_group","sessionTimeout":15000},
+        'names':['common'],
+        'topics':["broadcast"]
     }
 ];
 
@@ -32,9 +30,9 @@ else{
         this.mq_consumers = {};
     }
     
-    MQ.prototype.AddConsumer = function (conn, topics, options, handler){
+    MQ.prototype.AddConsumer = function (name, conn, topics, options, handler){
         this.client = new kafka.KafkaClient(conn);
-        let consumer = new kafka.Consumer(this.client, topics, options);
+        let consumer = new kafka.ConsumerGroup(Object.assign({"id":name},this.client, options),topics);
     
         if(!!handler){
             consumer.on('message', handler);
@@ -49,7 +47,7 @@ else{
     var mq = new MQ();
     
     
-    mq.AddConsumer(conn, consumers[0].topic, consumers[0].options, function (message){
+    mq.AddConsumer(consumers[0].names[0], conn, consumers[0].topics[0], consumers[0].options, function (message){
         //console.log('clientId : ',mq.client.clientId);
         //console.log('topicMetadata ',mq.client.topicMetadata);
         //console.log('correlationId ',mq.client.correlationId);
