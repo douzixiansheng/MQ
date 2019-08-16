@@ -1,0 +1,106 @@
+{
+  "_from": "kafka-node@4.1.3",
+  "_id": "kafka-node@4.1.3",
+  "_inBundle": false,
+  "_integrity": "sha512-C2WHksRCr7vIKmbxYaCk2c5Q1lnHIi6C0f3AioK3ARcRHGO9DpqErcoaS9d8PP62yzTnkYras+iAlmPsZHNSfw==",
+  "_location": "/kafka-node",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "kafka-node@4.1.3",
+    "name": "kafka-node",
+    "escapedName": "kafka-node",
+    "rawSpec": "4.1.3",
+    "saveSpec": null,
+    "fetchSpec": "4.1.3"
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/kafka-node/-/kafka-node-4.1.3.tgz",
+  "_shasum": "9e5fdf3a5562370ff0f82c5481bd14a6e39ad93d",
+  "_spec": "kafka-node@4.1.3",
+  "_where": "D:\\FrameWork\\MQ",
+  "bugs": {
+    "url": "https://github.com/SOHU-co/kafka-node/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "async": "^2.6.2",
+    "binary": "~0.3.0",
+    "bl": "^2.2.0",
+    "buffer-crc32": "~0.2.5",
+    "buffermaker": "~1.2.0",
+    "debug": "^2.1.3",
+    "denque": "^1.3.0",
+    "lodash": "^4.17.4",
+    "minimatch": "^3.0.2",
+    "nested-error-stacks": "^2.0.0",
+    "optional": "^0.1.3",
+    "retry": "^0.10.1",
+    "snappy": "^6.0.1",
+    "uuid": "^3.0.0"
+  },
+  "deprecated": false,
+  "description": "Client for Apache Kafka v0.9.x, v0.10.x and v0.11.x",
+  "devDependencies": {
+    "@types/node": "^10.12.27",
+    "coveralls": "^2.11.12",
+    "doctoc": "^1.2.0",
+    "eslint": "^5.14.1",
+    "eslint-config-semistandard": "^13.0.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-dependencies": "^2.2.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-node": "^8.0.1",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "execa": "^0.6.1",
+    "istanbul": "^0.4.4",
+    "mocha": "^3.1.0",
+    "optimist": "^0.6.1",
+    "proxyquire": "^1.7.10",
+    "should": "^6.0.0",
+    "sinon": "^2.0.0",
+    "through2": "^2.0.3",
+    "tslint": "^5.13.0",
+    "tslint-config-semistandard": "^7.0.0",
+    "typescript": "^2.8.3"
+  },
+  "engines": {
+    "node": ">=6.4.0"
+  },
+  "files": [
+    "kafka.js",
+    "logging.js",
+    "lib",
+    "types"
+  ],
+  "homepage": "https://github.com/SOHU-Co/kafka-node#readme",
+  "keywords": [
+    "kafka",
+    "consumer",
+    "producer",
+    "broker"
+  ],
+  "license": "MIT",
+  "main": "kafka.js",
+  "name": "kafka-node",
+  "optionalDependencies": {
+    "snappy": "^6.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SOHU-Co/kafka-node.git"
+  },
+  "scripts": {
+    "startDocker": "./start-docker.sh",
+    "stopDocker": "docker-compose down",
+    "test": "eslint . && npm run test:ts && ./run-tests.sh",
+    "test:ts": "tslint --project ./types/tsconfig.json --config ./types/tslint.json && tsc --project types",
+    "updateToc": "doctoc README.md --maxlevel 2 --notitle"
+  },
+  "types": "types/index.d.ts",
+  "version": "4.1.3"
+}

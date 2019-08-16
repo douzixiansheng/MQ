@@ -2,7 +2,8 @@
  * 消费者
  */
 
-const kafka = require('kafka-node');
+const kafka = require('./lib/kafka');
+//const kafka = require('kafka-node');
 const cluster = require('cluster');
 const num = require('os').cpus().length;
 
@@ -19,7 +20,7 @@ let consumers = [
 ];
 
 if(cluster.isMaster){
-    console.log(`Master start {pid}`,process.pid);
+    console.log(`Master start {pid}`,process.pid,`num `,num);
     for(let i = 0; i < num;i++){
         cluster.fork();
     }
@@ -36,6 +37,7 @@ else{
         this.client = new kafka.KafkaClient(conn);
         let consumer = new kafka.Consumer(this.client, topics, options);
     
+        console.log("-----------------xxx");
         if(!!handler){
             consumer.on('message', handler);
         }
@@ -57,7 +59,7 @@ else{
         //console.log('clusterMetadata ',mq.client.clusterMetadata);
         let _consumer = mq.mq_consumers['common'];
     
-        //console.log("----------consumer");
+        console.log("----------consumer");
         //console.log('topicMetadata ',_consumer.client.topicMetadata);
         //console.log('brokerMetadata ',_consumer.client.brokerMetadata);
         //console.log('clusterMetadata ',_consumer.client.clusterMetadata);

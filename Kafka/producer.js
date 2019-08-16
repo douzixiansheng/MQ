@@ -1,8 +1,8 @@
 /**
  * 生产者
  */
-
-const kafka = require('kafka-node');
+const kafka = require('./lib/kafka');
+//const kafka = require('kafka-node');
 
 let conn = {'kafkaHost':'127.0.0.1:9092'};
 
